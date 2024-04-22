@@ -1,0 +1,91 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+import time
+from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import StaleElementReferenceException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions
+thisNum = 1
+links = []
+def getNextNum():
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    global thisNum
+
+    next = thisNum
+    allnums = driver.find_elements(By.CLASS_NAME, "page-item")
+    for num in allnums:
+        if num.text == str(next):
+            thisNum += 1
+            print("PAGE - "+num.text)
+            return num
+    return None
+
+f = True
+def stepNextPage():
+    if getNextNum() != None:
+        driver.find_element(By.CLASS_NAME, "page-next").click()
+    else:
+        global f
+        f = False  
+from selenium.webdriver.common.action_chains import ActionChains  
+options = Options()
+driver = webdriver.Chrome(options=options, executable_path='chromedriver.exe')
+actions = ActionChains(driver)
+driver.get('https://icatalog.expocentr.ru/ru')
+def getExponent(name):
+    all = driver.find_elements(By.CLASS_NAME, "list-group-item")
+    for i in all:
+        if name == i.text:
+            return i
+    return None
+max = None
+def getAllLinks():
+    global links, thisNum, max, f
+    # перебор текущ ленты(сбор ссылок)
+    # переход на следующую
+    # ...
+    # вренуть список ссылок
+    
+    body = driver.find_element(By.TAG_NAME, "tbody")
+    rows = body.find_elements(By.TAG_NAME, "tr")
+    
+    print(str(thisNum)+" - "+str(len(rows)))
+    print(str(len(links))+" -links AND max- "+str(max))
+    if len(links) == int(max):
+        f = False
+        return 0
+
+    for row in rows:
+        namecell = row.find_elements(By.TAG_NAME, "td")[0]
+        print(str(thisNum)+" - "+str(len(row.find_elements(By.TAG_NAME, "a"))))
+        links.append(namecell.find_element(By.TAG_NAME, "a").get_attribute("href"))
+    print("\nLENGHT:")
+    print(len(links))
+# def getcardinfo():
+#     dt =
+def main():
+    global max
+    exp = getExponent("СВЯЗЬ-2024")
+    driver.get(exp.get_attribute("href"))
+    driver.get(driver.find_element(By.XPATH, '//*[@id="navbarNavDropdown"]/ul/li[2]/a').get_attribute("href"))
+    max = driver.find_element(By.XPATH, '/html/body/div/h3/span').text
+    while f:
+        getAllLinks()
+        stepNextPage()
+    items = []
+    for link in links:
+        item = {}
+        driver.get(link)
+        # q = driver.find_element(By.XPATH, '//*[@id="main"]/div[1]/div/div[1]')
+        # print(q.text)
+
+        # name = driver.find_element(By.XPATH, '//*[@id="main"]/div[1]/div/div[1]/div[1]')
+        name = driver.find_elements(By.TAG_NAME, 'dd')
+        print(len(name))
+
+        time.sleep(123123)
+    time.sleep(123123)
+
+main()
